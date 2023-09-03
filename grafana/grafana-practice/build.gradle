@@ -1,0 +1,87 @@
+plugins {
+    id("java")
+    id("org.springframework.boot") version "3.0.0"
+    id("io.spring.dependency-management") version "1.1.3"
+    id("org.asciidoctor.jvm.convert") version "3.3.2"
+}
+
+ext {
+    springBootVersion = "3.0.0"
+    restdocsVersion = "3.0.0"
+    lombokVersion = "1.18.26"
+    snippetsDir = file("${buildDir}/generated-snippets")
+    docsDir = file("${buildDir}/docs/asciidoc")
+    staticDocsDir = file("${rootDir}/src/main/resources/static/docs")
+}
+
+group = 'project.monitoring'
+version = '0.0.1-SNAPSHOT'
+
+configurations {
+    asciidoctorExt
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // SpringBoot
+    implementation("org.springframework.boot:spring-boot-starter-web")
+
+    // RestDocs
+    implementation("org.springframework.restdocs:spring-restdocs-core:${restdocsVersion}")
+
+    // Jpa
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+    // MySQL
+    implementation("com.mysql:mysql-connector-j:8.1.0")
+
+    // Monitoring
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("io.micrometer:micrometer-registry-prometheus")
+
+    // Test
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
+    asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
+
+    // Lombok
+    compileOnly("org.projectlombok:lombok:${lombokVersion}")
+    annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+}
+
+test {
+    outputs.dir snippetsDir
+    useJUnitPlatform()
+}
+
+asciidoctor {
+    inputs.dir snippetsDir
+    configurations "asciidoctorExt"
+    dependsOn test
+}
+
+task copyDocument(type: Copy) {
+    dependsOn asciidoctor
+    doFirst {
+        delete staticDocsDir
+    }
+    from docsDir
+    into staticDocsDir
+}
+
+build {
+    dependsOn copyDocument
+}
+
+bootJar {
+    dependsOn asciidoctor
+    from("${docsDir}/html5") {
+        into "static/docs"
+    }
+}
