@@ -1,4 +1,4 @@
-# Grafana
+# Prometheus & Grafana
 
 Monitor indicators such as JVM, API calls, etc. using Actor, Prometheus, and Grafna while creating simple ordering applications. This collects simple metrics and produces statistics.
 
@@ -7,6 +7,9 @@ Monitor indicators such as JVM, API calls, etc. using Actor, Prometheus, and Gra
 <br/><br/><br/><br/>
 
 ## Getting Started
+
+Before running the application, please set the settings for application.yml, Prometheus, and Grafana. The settings for Prometheus and Grafana are not attached separately.
+
 
 > You should install jdk 17 or higher. <br/>
 
@@ -37,6 +40,10 @@ $ ./gradlew build
 <br/><br/>
 
 ## Result
+
+It is made possible to monitor using the environment provided by [Grafana](https://grafana.com/grafana/dashboards/).
+
+![image](resources/images/result.png)
 
 <br/><br/>
 
