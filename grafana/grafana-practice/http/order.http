@@ -1,0 +1,9 @@
+### ORDER ###
+
+POST {{api}}/api/orders
+Content-Type: application/json
+
+{
+  "productId": 1,
+  "title": "스터디 카페 한 달 정기 이용권"
+}
