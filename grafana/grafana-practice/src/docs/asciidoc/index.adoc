@@ -1,0 +1,66 @@
+= Monitoring (feat. Grafana)
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+
+
+== 1. Order
+
+주문 도메인
+
+=== 1-1. 주문
+
+Request
+
+include::{snippets}/order-create-documentation-test/order_create_test/http-request.adoc[]
+
+Request-Fields
+
+include::{snippets}/order-create-documentation-test/order_create_test/request-fields.adoc[]
+
+
+Response
+
+include::{snippets}/order-create-documentation-test/order_create_test/http-response.adoc[]
+include::{snippets}/order-create-documentation-test/order_create_test/response-body.adoc[]
+
+Error Response
+
+include::{snippets}/order-create-documentation-test/order_create_product_not_found_test/response-body.adoc[]
+
+
+
+
+== 2. Product
+
+상품 도메인
+
+=== 2-1. 상품 상세 조회
+
+
+Request
+
+include::{snippets}/product-search-documentation-test/product_search_by_id_test/http-request.adoc[]
+
+Path Parameters
+
+include::{snippets}/product-search-documentation-test/product_search_by_id_test/path-parameters.adoc[]
+
+
+Response
+
+include::{snippets}/product-search-documentation-test/product_search_by_id_test/response-body.adoc[]
+
+include::{snippets}/product-search-documentation-test/product_search_by_id_test/response-fields.adoc[]
+
+Error Response
+
+include::{snippets}/product-search-documentation-test/product_search_not_found_test/response-body.adoc[]
