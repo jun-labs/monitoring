@@ -3,19 +3,22 @@ plugins {
     id("org.springframework.boot") version "3.0.0"
     id("io.spring.dependency-management") version "1.1.3"
     id("org.asciidoctor.jvm.convert") version "3.3.2"
+    id("com.epages.restdocs-api-spec") version "0.17.1"
 }
 
 ext {
     springBootVersion = "3.0.0"
     restdocsVersion = "3.0.0"
     lombokVersion = "1.18.26"
+    jetBrainAnnotationVersion = "24.0.1"
+    mySqlVersion = "8.1.0"
     snippetsDir = file("${buildDir}/generated-snippets")
-    docsDir = file("${buildDir}/docs/asciidoc")
     staticDocsDir = file("${rootDir}/src/main/resources/static/docs")
+    restdocsApiSpec = "0.17.1"
 }
 
-group = 'project.monitoring'
-version = '0.0.1-SNAPSHOT'
+group = "project.monitoring"
+version = "0.0.1"
 
 configurations {
     asciidoctorExt
@@ -31,15 +34,18 @@ repositories {
 dependencies {
     // SpringBoot
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-validation:${springBootVersion}")
 
     // RestDocs
     implementation("org.springframework.restdocs:spring-restdocs-core:${restdocsVersion}")
+    implementation("org.jetbrains:annotations:${jetBrainAnnotationVersion}")
+    testImplementation("org.springframework.restdocs:spring-restdocs-restassured")
 
     // Jpa
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     // MySQL
-    implementation("com.mysql:mysql-connector-j:8.1.0")
+    implementation("com.mysql:mysql-connector-j:${mySqlVersion}")
 
     // Monitoring
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -48,6 +54,7 @@ dependencies {
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
+    testImplementation("com.epages:restdocs-api-spec-mockmvc:${restdocsApiSpec}")
     asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
 
     // Lombok
@@ -62,26 +69,35 @@ test {
 
 asciidoctor {
     inputs.dir snippetsDir
-    configurations "asciidoctorExt"
+    configurations 'asciidoctorExt'
     dependsOn test
 }
 
-task copyDocument(type: Copy) {
+task copyAsccidoctor(type: Copy) {
     dependsOn asciidoctor
-    doFirst {
-        delete staticDocsDir
-    }
-    from docsDir
-    into staticDocsDir
+    from asciidoctor.outputDir
+    into("${rootDir}/src/main/resources/static/api-docs")
+}
+
+openapi3 {
+    server = "http://localhost:8080"
+    title = "Monitoring."
+    description = "Grafana monitoring practice."
+    version = "0.0.1"
+    format = "json"
+}
+
+task copyOpenApiSpecToStatic(type: Copy) {
+    dependsOn("openapi3")
+    from("${buildDir}/api-spec/openapi3.json")
+    into("${rootDir}/src/main/resources/static/docs")
+}
+
+task copyApiSpec {
+    dependsOn copyOpenApiSpecToStatic
 }
 
 build {
-    dependsOn copyDocument
-}
-
-bootJar {
-    dependsOn asciidoctor
-    from("${docsDir}/html5") {
-        into "static/docs"
-    }
+    dependsOn copyAsccidoctor
+    dependsOn copyApiSpec
 }
